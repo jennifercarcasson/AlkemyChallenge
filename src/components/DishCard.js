@@ -11,15 +11,16 @@ import {
   Typography,
 } from "@material-ui/core";
 import DeleteIcon, { Delete, PlusOne } from "@material-ui/icons";
-import React from "react";
+import React, { useContext } from "react";
 import Icon from "@material-ui/core/Icon";
 import SaveIcon from "@material-ui/icons/Save";
 import { Info } from "@material-ui/icons";
 import { findByLabelText } from "@testing-library/react";
+import { AppContext } from "../App";
 
 const useStyles = makeStyles({
   root: {
-    maxWidth: 450,
+    width: 450,
     margin: "20px",
     display: "flex",
     flexDirection: "column",
@@ -39,7 +40,6 @@ const DishCard = ({
   addToMenu = false,
   id,
   image,
-  summary,
   pricePerServing,
   servings,
   title,
@@ -51,76 +51,74 @@ const DishCard = ({
   readyInMinutes,
   onAddDishHandler,
   totalPrice,
+  infoClickHandler,
+  deleteClickHandler,
+  onCardClick = () => {},
 }) => {
   const classes = useStyles();
 
   return (
     <Card className={classes.root}>
-      <CardMedia
-        className={classes.media}
-        image={image}
-        title={title}
-        characteristics=""
-      />
-      <CardContent>
-        <Typography gutterBottom variant="h5" component="h2">
-          {title}
-        </Typography>
-        <Typography
-          dangerouslySetInnerHTML={{ __html: summary }}
-          variant="body2"
-          color="textSecondary"
-          component="p"
-        ></Typography>
+      <CardActionArea onClick={onCardClick}>
+        <CardMedia
+          className={classes.media}
+          image={image}
+          title={title}
+          characteristics=""
+        />
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="h2">
+            {title}
+          </Typography>
 
-        <div className={classes.infoContainer}>
-          <div className={classes.infoRow}>
-            {glutenFree && (
-              <Typography variant="body2" color="textPrimary" component="p">
-                Gluten Free
-              </Typography>
-            )}
-            {dairyFree && (
-              <Typography variant="body2" color="textPrimary" component="p">
-                Diary Free
-              </Typography>
-            )}
-            {vegan && (
-              <Typography variant="body2" color="textPrimary" component="p">
-                Vegan
-              </Typography>
-            )}
-          </div>
-
-          {
+          <div className={classes.infoContainer}>
             <div className={classes.infoRow}>
-              <Typography variant="body2" color="primary" component="p">
-                Health Score: {healthScore}
-              </Typography>
-              <Typography variant="body2" color="primary" component="p">
-                Ready in Minutes: {readyInMinutes}
-              </Typography>
+              {glutenFree && (
+                <Typography variant="body2" color="primary" component="p">
+                  Gluten Free
+                </Typography>
+              )}
+              {dairyFree && (
+                <Typography variant="body2" color="primary" component="p">
+                  Diary Free
+                </Typography>
+              )}
+              {vegan && (
+                <Typography variant="body2" color="primary" component="p">
+                  Vegan
+                </Typography>
+              )}
             </div>
-          }
 
-          <div className={classes.infoRow}>
             {
-              <>
-                <Typography variant="body2" color="secondary" component="p">
-                  {`Price per Serving: $${pricePerServing}`}
+              <div className={classes.infoRow}>
+                <Typography variant="body2" color="primary" component="p">
+                  Health Score: {healthScore}
                 </Typography>
-                <Typography variant="body2" color="secondary" component="p">
-                  Servings: {servings}
+                <Typography variant="body2" color="primary" component="p">
+                  Ready in Minutes: {readyInMinutes}
                 </Typography>
-                <Typography variant="body2" color="secondary" component="p">
-                  {`Total: $${totalPrice}`}
-                </Typography>
-              </>
+              </div>
             }
-          </div>
-        </div>
-      </CardContent>
 
+            <div className={classes.infoRow}>
+              {
+                <>
+                  <Typography variant="body2" color="primary" component="p">
+                    {`Price per Serving: $${pricePerServing}`}
+                  </Typography>
+                  <Typography variant="body2" color="primary" component="p">
+                    Servings: {servings}
+                  </Typography>
+                  <Typography variant="body2" color="primary" component="p">
+                    {`Total: $${totalPrice}`}
+                  </Typography>
+                </>
+              }
+            </div>
+          </div>
+        </CardContent>
+      </CardActionArea>
       <CardActions style={{ justifyContent: "right" }}>
         {addToMenu ? (
           <div>
@@ -135,10 +133,18 @@ const DishCard = ({
           </div>
         ) : (
           <div>
-            <IconButton aria-label="info" color="primary">
+            <IconButton
+              aria-label="info"
+              color="primary"
+              onClick={() => infoClickHandler(id)}
+            >
               <Info />
             </IconButton>
-            <IconButton aria-label="info" color="primary">
+            <IconButton
+              aria-label="info"
+              color="primary"
+              onClick={() => deleteClickHandler(id)}
+            >
               <Delete />
             </IconButton>
           </div>

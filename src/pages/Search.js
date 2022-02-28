@@ -4,14 +4,17 @@ import {
   Checkbox,
   Button,
   FormControlLabel,
+  Container,
 } from "@material-ui/core";
 import axios from "axios";
 import { AppContext } from "../App";
 import DishCard from "../components/DishCard";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const Search = () => {
   const appContext = useContext(AppContext);
+  const navigate = useNavigate();
   const [searchText, setSearchText] = useState("");
   const [isVegan, setIsVegan] = useState(false);
   const [dishes, setDishes] = useState([]);
@@ -21,8 +24,7 @@ const Search = () => {
     appContext;
   console.log(menu);
   const onClickHandler = () => {
-    const valid = true;
-    if (valid) {
+    if (searchText.length >= 2) {
       axios({
         method: "get",
         url: `https://api.spoonacular.com/recipes/complexSearch?addRecipeInformation=true&number=${maxDishes}&query=${searchText}${
@@ -38,6 +40,7 @@ const Search = () => {
 
   const onAddDishHandler = (dishId) => {
     const dish = dishes.find((dish) => dish.id === dishId);
+    const filteredDishes = dishes.filter((dish) => dish.id !== dishId);
     if (menu.filter((dish) => dish.id === dishId).length < 1) {
       if (dish.vegan) {
         if (dishesQuantity?.vegan < dishesQuantity?.maxVegan) {
@@ -49,6 +52,20 @@ const Search = () => {
             ...prevQuantities,
             vegan: prevQuantities.vegan + 1,
           }));
+          const filteredDishes = dishes.filter((dish) => dish.id !== dishId);
+          setDishes(filteredDishes);
+          Swal.fire({
+            title: "¿ Deseas agregar otro plato al menú ?",
+            text: `Has agregado ${dish.title} al menú`,
+            showDenyButton: true,
+            confirmButtonText: "Si, agregar otro",
+            denyButtonText: `No, ir al menú`,
+          }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isDenied) {
+              navigate("/");
+            }
+          });
         } else {
           Swal.fire({
             icon: "error",
@@ -66,6 +83,19 @@ const Search = () => {
             ...prevQuantities,
             noVegan: prevQuantities.noVegan + 1,
           }));
+          setDishes(filteredDishes);
+          Swal.fire({
+            title: "¿ Deseas agregar otro plato al menú ?",
+            text: `Has agregado ${dish.title} al menú`,
+            showDenyButton: true,
+            confirmButtonText: "Si, agregar otro",
+            denyButtonText: `No, ir al menú`,
+          }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isDenied) {
+              navigate("/");
+            }
+          });
         } else {
           Swal.fire({
             icon: "error",
@@ -85,10 +115,11 @@ const Search = () => {
 
   return (
     <>
-      <div className="searchBar">
+      <Container>
         <TextField
           value={searchText}
           onChange={(event) => setSearchText(event.target.value)}
+          onKeyPress={(event) => event.key === "Enter" && onClickHandler()}
         />
         <FormControlLabel
           label="Vegan"
@@ -99,7 +130,7 @@ const Search = () => {
         <Button variant="contained" color="primary" onClick={onClickHandler}>
           Search
         </Button>
-      </div>
+      </Container>
 
       {}
       <div className="dishesContainer">
@@ -113,6 +144,7 @@ const Search = () => {
               summary={dish.summary}
               pricePerServing={dish.pricePerServing}
               servings={dish.servings}
+              totalPrice={dish.pricePerServing * dish.servings}
               title={dish.title}
               vegan={dish.vegan}
               dairyFree={dish.dairyFree}

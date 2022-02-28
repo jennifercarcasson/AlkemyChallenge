@@ -1,9 +1,11 @@
 import { Button, CircularProgress, TextField } from "@material-ui/core";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
-const Login = ({ setApiKey }) => {
+const Login = () => {
+  const navigate = useNavigate();
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [isCallingApi, setIsCallingApi] = useState(false);
@@ -21,8 +23,8 @@ const Login = ({ setApiKey }) => {
       })
         .then((response) => {
           //proceso la respuesta
-          setApiKey({ value: response.data?.token });
-          console.log(response);
+          localStorage.setItem("token", response.data?.token);
+          navigate("/");
         })
         .catch((err) => {
           Swal.fire({
@@ -61,7 +63,12 @@ const Login = ({ setApiKey }) => {
         type="password"
         l
       />
-      <Button disabled={isCallingApi} onClick={validarFormulario}>
+      <Button
+        variant="contained"
+        color="primary"
+        disabled={isCallingApi}
+        onClick={validarFormulario}
+      >
         Enviar{isCallingApi && <CircularProgress />}
       </Button>
     </form>

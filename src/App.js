@@ -10,13 +10,13 @@ import {
 } from "react-router-dom";
 import Login from "./pages/Login";
 import Search from "./pages/Search";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const API_KEY = "299e713eb7ac4bd69b22d690acfeb5c4";
 export const AppContext = React.createContext();
 
 function App() {
-  const [isAuth, setIsAuth] = useState(true);
+  let isAuth = false;
   const [menu, setMenu] = useState([]);
   const [dishesQuantity, setDishesQuantity] = useState({
     vegan: 0,
@@ -24,14 +24,16 @@ function App() {
     maxVegan: 2,
     maxNoVegan: 2,
   });
-  console.log(menu);
   //mirar localstorage
+  const getAuth = () => {
+    return localStorage.getItem("token") ? true : false;
+  };
+
   return (
     <AppContext.Provider
       value={{
         API_KEY,
         isAuth,
-        setIsAuth,
         menu,
         setMenu,
         dishesQuantity,
@@ -42,18 +44,12 @@ function App() {
         <Router>
           <Header />
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/search" element={<Search />} />
-            {
-              //isAuth && <Route path="/" element={<Home />} />
-            }
-            {
-              //isAuth && <Route path="/search" element={<Search />} />
-            }
-            {
-              //!isAuth && <Route path="*" element={<Navigate to="/login" />} />
-            }
-            <Route path="/login" element={<Login />} />
+            {getAuth() && <Route path="/" element={<Home />} />}
+            {getAuth() && <Route path="/search" element={<Search />} />}
+            {!getAuth() && (
+              <Route path="*" element={<Navigate to="/login" />} />
+            )}
+            <Route exact path="/login" element={<Login />} />
           </Routes>
         </Router>
       </div>

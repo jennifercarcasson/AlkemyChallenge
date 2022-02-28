@@ -19,6 +19,7 @@ const useStyle = makeStyles((theme) => ({
   link: {
     color: "white",
     textDecoration: "none",
+    marginLeft: "1rem",
   },
 }));
 
@@ -38,11 +39,11 @@ export default function Header() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" className={classes.title}>
-            <Link to="/" className={classes.link}>
-              Hotel Canvas
-            </Link>
+            Hotel Canvas
           </Typography>
-
+          <Link to="/" className={classes.link}>
+            Menú
+          </Link>
           <Link to="/search" className={classes.link}>
             Search
           </Link>
